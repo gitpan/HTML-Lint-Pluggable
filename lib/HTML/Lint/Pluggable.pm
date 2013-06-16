@@ -2,13 +2,29 @@ package HTML::Lint::Pluggable;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use parent qw/ HTML::Lint /;
 
 use Carp qw/croak/;
 use Class::Load qw/load_class/;
-use Hash::Util::FieldHash qw/fieldhash/;
+
+sub new {
+    my $class = shift;
+
+    my $subclass;
+    do {
+        $subclass = sprintf '%s::__ANON__::%x%x%x', $class, $$, 0+{}, int(rand(65535));
+    } while $subclass->isa($class);
+
+    eval sprintf q{{
+        package %s;
+        our @ISA = qw/%s/;
+    }}, $subclass, $class;
+    die $@ if $@;
+
+    return $subclass->SUPER::new(@_);
+}
 
 sub load_plugins {
     my $self = shift;
@@ -26,32 +42,15 @@ sub load_plugin {
     $plugin->init($self, $conf);
 }
 
-fieldhash my %OVERRIDED_CODES;
-my %ROOTCODE;
 sub override {
-    my($self, $method, $code) = @_;
+    my ($self, $method, $code) = @_;
     my $class = ref($self) or croak('this method can called by instance only.');
 
-    $OVERRIDED_CODES{$self}          ||= +{};
-    $ROOTCODE{$class}                ||= +{};
-    $OVERRIDED_CODES{$self}{$method} ||= $ROOTCODE{$class}{$method} || $class->can($method);
-    $OVERRIDED_CODES{$self}{$method}   = $code->($OVERRIDED_CODES{$self}{$method});
-
-    unless ($ROOTCODE{$class}{$method}) {
-        my $orig = $ROOTCODE{$class}{$method} = $class->can($method);
-        my $method_code = sub {
-            my $self = shift;
-
-            if (exists $OVERRIDED_CODES{$self}) {
-                my $super = $OVERRIDED_CODES{$self}{$method};
-                return $self->$super(@_) if $super;
-            }
-
-            return $self->$orig(@_);
-        };
+    {
+        my $override_code = $code->($class->can($method));
 
         no strict 'refs';
-        *{"${class}::${method}"} = $method_code;
+        *{"${class}::${method}"} = $override_code;
     }
 }
 
@@ -64,7 +63,7 @@ HTML::Lint::Pluggable - plugin system for HTML::Lint
 
 =head1 VERSION
 
-This document describes HTML::Lint::Pluggable version 0.01.
+This document describes HTML::Lint::Pluggable version 0.02.
 
 =head1 SYNOPSIS
 
