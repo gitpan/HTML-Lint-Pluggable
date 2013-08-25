@@ -16,7 +16,7 @@ configure_requires:
   Module::Build::Pluggable::ReadmeMarkdownFromPod: 0.04
   Module::Build::Pluggable::Repository: 0.01
 dynamic_config: 0
-generated_by: 'Minilla/v0.0.53, CPAN::Meta::Converter version 2.130880'
+generated_by: 'Minilla/v0.6.4, CPAN::Meta::Converter version 2.131560'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,19 +30,20 @@ no_index:
     - share
     - eg
     - examples
+    - author
 provides:
   HTML::Lint::Pluggable:
     file: lib/HTML/Lint/Pluggable.pm
-    version: 0.02
+    version: 0.03
   HTML::Lint::Pluggable::HTML5:
     file: lib/HTML/Lint/Pluggable/HTML5.pm
-    version: 0.02
+    version: 0.03
   HTML::Lint::Pluggable::TinyEntitesEscapeRule:
     file: lib/HTML/Lint/Pluggable/TinyEntitesEscapeRule.pm
-    version: 0.02
+    version: 0.03
   HTML::Lint::Pluggable::WhiteList:
     file: lib/HTML/Lint/Pluggable/WhiteList.pm
-    version: 0.02
+    version: 0.03
 requires:
   Carp: 0
   Class::Load: 0
@@ -55,4 +56,4 @@ resources:
   bugtracker: https://github.com/karupanerura/p5-HTML-Lint-Pluggable/issues
   homepage: https://github.com/karupanerura/p5-HTML-Lint-Pluggable
   repository: git://github.com/karupanerura/p5-HTML-Lint-Pluggable.git
-version: 0.02
+version: 0.03
